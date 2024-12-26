@@ -362,3 +362,79 @@ footer {
 .wallet-table tr:hover {
     background-color: #f1f1f1;
 }
+
+
+/* Trading Buttons */
+.trading-buttons {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+    border: 
+    
+}
+
+.trading-buttons button {
+    width: 100px;
+    padding: 10px;
+    border: 2px solid #4caf50;
+    border-radius: 5px;
+    background-color: white;
+    color: #4caf50;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.trading-buttons .active.buy-button {
+    background-color: #4caf50;
+    color: white;
+}
+
+.trading-buttons .active.sell-button {
+    background-color: red;
+    color: white;
+    border-color: red;
+}
+
+/* Input Section */
+.trading-inputs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.trading-inputs input {
+    padding: 10px;
+    width: 150px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Action Button */
+
+.trading-action{
+    display: flex;
+    justify-content: center;
+}
+
+.trading-action .trade-button {
+    width: 200px;
+    padding: 10px;
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.trading-action .trade-button.buy {
+    background-color: #4caf50;
+}
+
+.trading-action .trade-button.sell {
+    background-color: red;
+}
