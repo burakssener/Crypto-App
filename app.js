@@ -49,6 +49,8 @@ function renderPage() {
               </div>
             </main>
         `);
+        
+        
 
         $("#newProfileButton").on("click", function () {
             $("#modal").removeClass("hidden");
@@ -57,7 +59,7 @@ function renderPage() {
         $("#addProfileButton").on("click", function () {
             const newName = $("#newProfileInput").val().trim();
             if (newName) {
-                states.profiles.push({ name: newName, wallet: [{dollar: 1000}], date: "01-01-2021",  activeCoin: 'btc' });
+                states.profiles.push({ name: newName, wallet: [{dollar: 1000}], date: "02-01-2021",  activeCoin: 'btc' });
                 update();
                 $("#modal").addClass("hidden");
             }
@@ -109,7 +111,10 @@ function renderPage() {
             </main>
         `);
 
-        $(document).on("mouseenter", ".candlestick-container", function () {
+        $(".market").html(renderMarket());
+
+        $('.candlestick-container').on('mouseenter', function() {
+
             const index = $(this).data("index");
             const marketData = states.market_todate[index];
             $("#active_coin_data").css("visibility", "visible");
@@ -119,10 +124,9 @@ function renderPage() {
             }
         });
 
-        $(document).on("mouseleave", ".candlestick-container", function () {
-            
+        $('.candlestick-container').on('mouseleave', function() {
+
             $("#active_coin_data").css("visibility", "hidden");
-            
         });
         
         
@@ -184,8 +188,8 @@ function renderMarket() {
 
     const marketMinLow = Math.min(...market_todate.map((m) => m.low));
     const maxRange = Math.max(...market_todate.map((m) => m.high - m.low));
-    const chartHeight = 300;
-    const scaleFactor = (chartHeight / maxRange) * 0.6;
+    const chartHeight = $(".market").height();
+    const scaleFactor = (chartHeight / maxRange) * 0.2;
 
     let x = 0;
     let out = "";
@@ -203,11 +207,24 @@ function renderMarket() {
                 <div class='bar' style='background:${color}; bottom:${barPos}px; height:${barHeight}px;'></div>
             </div>
         `;
+
         x += 10;
     });
 
+    // Add the dotted line for the latest (most recent) close price
+    const latestData = market_todate[market_todate.length - 1];
+    if (latestData) {
+        const latestClosePos = (latestData.close - marketMinLow) * scaleFactor;
+        out += `
+            <div class="latest-price-line" style=" bottom: ${latestClosePos}px;">
+                <span class="latest-price-label">${latestData.close}</span>
+            </div>
+        `;
+    }
+
     return out;
 }
+
 
   
 function renderTable()
