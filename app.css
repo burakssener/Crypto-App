@@ -256,6 +256,10 @@ main > #inputs > .hidden {
     border: 1px solid #000000;
 }
 
+.hidden{
+    display: none;
+
+}
 
 .chart-container {
     
@@ -273,6 +277,11 @@ main > #inputs > .hidden {
     bottom: 0;
     width: 6px;
     transition: left 0.5s ease-in-out;
+    cursor: pointer;
+}
+.candlestick-container:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
 }
 
 .stick {

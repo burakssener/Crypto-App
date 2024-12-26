@@ -109,13 +109,23 @@ function renderPage() {
             </main>
         `);
 
-        $("#active_coin").on("hover", function (){
-
-
-
-
-
+        $(document).on("mouseenter", ".candlestick-container", function () {
+            const index = $(this).data("index");
+            const marketData = states.market_todate[index];
+            $("#active_coin_data").css("visibility", "visible");
+    
+            if (marketData) {
+                $("#active_coin_data").text(`Date: ${marketData.date} Open: ${marketData.open} Close: ${marketData.close} High: ${marketData.high} low: ${marketData.low} `);
+            }
         });
+
+        $(document).on("mouseleave", ".candlestick-container", function () {
+            
+            $("#active_coin_data").css("visibility", "hidden");
+            
+        });
+        
+        
 
         $("#backButton").on("click", function () {
             states.active = 0;
@@ -150,15 +160,13 @@ function renderMarket() {
     const profile = states.profiles[states.activeProfile];
     const activeCoin = profile.activeCoin;
 
-    // Parse the profile date and calculate the start date for the 120-day window
     const profileDate = new Date(profile.date.split('-').reverse().join('-'));
     const startDate = new Date(profileDate);
-    startDate.setDate(startDate.getDate() - 120); // 120 days ago
+    startDate.setDate(startDate.getDate() - 120);
 
     for (let m of market) {
         const marketDate = new Date(m.date.split('-').reverse().join('-'));
 
-        // Include only data points within the 120-day window
         if (marketDate >= startDate && marketDate <= profileDate) {
             const coinData = m.coins.find((coin) => coin.code === activeCoin);
             if (coinData) {
@@ -167,20 +175,22 @@ function renderMarket() {
         }
     }
 
+    // Store in global state
+    states.market_todate = market_todate;
+
     if (market_todate.length === 0) {
         return "<p>No market data available for the selected coin.</p>";
     }
 
     const marketMinLow = Math.min(...market_todate.map((m) => m.low));
     const maxRange = Math.max(...market_todate.map((m) => m.high - m.low));
-    const chartHeight = 300; // Define chart height in pixels
-    const scaleFactor = chartHeight / maxRange * 0.2;
+    const chartHeight = 300;
+    const scaleFactor = (chartHeight / maxRange) * 0.6;
 
     let x = 0;
     let out = "";
-    let i = 0;
-    // Render candlesticks for the filtered 120 days of market data
-    for (let data of market_todate) {
+
+    market_todate.forEach((data, i) => {
         let stickHeight = (data.high - data.low) * scaleFactor;
         let barHeight = Math.abs(data.open - data.close) * scaleFactor;
         let barPos = (Math.min(data.open, data.close) - marketMinLow) * scaleFactor;
@@ -188,18 +198,17 @@ function renderMarket() {
         let color = data.open < data.close ? "green" : "red";
 
         out += `
-            <div class="candlestick-container" style="left:${x}px; data-index="${i}">
+            <div class="candlestick-container" style="left:${x}px;" data-index="${i}">
                 <div class='stick' style='height:${stickHeight}px; bottom:${normalizedLow}px;'></div>
                 <div class='bar' style='background:${color}; bottom:${barPos}px; height:${barHeight}px;'></div>
             </div>
         `;
-
-        i++;
-        x += 10; // Adjust spacing between candlesticks (smaller for 120 days)
-    }
+        x += 10;
+    });
 
     return out;
 }
+
   
 function renderTable()
 {
@@ -220,6 +229,7 @@ function renderTable()
     out += `<div id="active_coin"> 
                 <img src="./images/${profile.activeCoin}.png" >
                 <div>${profile.activeCoin}</div>
+                <div id="active_coin_data"></div>
             </div>`;
 
     return out;
