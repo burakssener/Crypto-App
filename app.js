@@ -97,7 +97,9 @@ function renderPage() {
                     </div>
                     <div id="wallet">
                         ${renderTable()}
-                        <p>${renderMarket()}</p>
+                        <div class="market">
+                            ${renderMarket()} 
+                        </div>
                         ${renderLogin(profile1)}
                     </div>
                 </section>
@@ -106,6 +108,14 @@ function renderPage() {
               
             </main>
         `);
+
+        $("#active_coin").on("hover", function (){
+
+
+
+
+
+        });
 
         $("#backButton").on("click", function () {
             states.active = 0;
@@ -135,21 +145,24 @@ function renderPage() {
         });
     }
 }
-
 function renderMarket() {
     const market_todate = [];
     const profile = states.profiles[states.activeProfile];
     const activeCoin = profile.activeCoin;
 
-    for (let m of market) {
-        const marketDate = new Date(m.date.split('-').reverse().join('-')); // Convert 'DD-MM-YYYY' to 'YYYY-MM-DD'
-        const profileDate = new Date(profile.date.split('-').reverse().join('-'));
+    // Parse the profile date and calculate the start date for the 120-day window
+    const profileDate = new Date(profile.date.split('-').reverse().join('-'));
+    const startDate = new Date(profileDate);
+    startDate.setDate(startDate.getDate() - 120); // 120 days ago
 
-        if (marketDate <= profileDate) {
-            // Filter coins for the active coin
-            const coinData = m.coins.find(coin => coin.code === activeCoin);
+    for (let m of market) {
+        const marketDate = new Date(m.date.split('-').reverse().join('-'));
+
+        // Include only data points within the 120-day window
+        if (marketDate >= startDate && marketDate <= profileDate) {
+            const coinData = m.coins.find((coin) => coin.code === activeCoin);
             if (coinData) {
-                market_todate.push({ date: m.date, ...coinData }); // Include the date with the coin data
+                market_todate.push({ date: m.date, ...coinData });
             }
         }
     }
@@ -158,12 +171,36 @@ function renderMarket() {
         return "<p>No market data available for the selected coin.</p>";
     }
 
-    // Convert the filtered data to a readable format
-    return market_todate
-        .map(m => `Date: ${m.date}, Open: ${m.open}, High: ${m.high}, Low: ${m.low}, Close: ${m.close}`)
-        .join("<br>");
-}
+    const marketMinLow = Math.min(...market_todate.map((m) => m.low));
+    const maxRange = Math.max(...market_todate.map((m) => m.high - m.low));
+    const chartHeight = 300; // Define chart height in pixels
+    const scaleFactor = chartHeight / maxRange * 0.2;
 
+    let x = 0;
+    let out = "";
+    let i = 0;
+    // Render candlesticks for the filtered 120 days of market data
+    for (let data of market_todate) {
+        let stickHeight = (data.high - data.low) * scaleFactor;
+        let barHeight = Math.abs(data.open - data.close) * scaleFactor;
+        let barPos = (Math.min(data.open, data.close) - marketMinLow) * scaleFactor;
+        let normalizedLow = (data.low - marketMinLow) * scaleFactor;
+        let color = data.open < data.close ? "green" : "red";
+
+        out += `
+            <div class="candlestick-container" style="left:${x}px; data-index="${i}">
+                <div class='stick' style='height:${stickHeight}px; bottom:${normalizedLow}px;'></div>
+                <div class='bar' style='background:${color}; bottom:${barPos}px; height:${barHeight}px;'></div>
+            </div>
+        `;
+
+        i++;
+        x += 10; // Adjust spacing between candlesticks (smaller for 120 days)
+    }
+
+    return out;
+}
+  
 function renderTable()
 {
     let out = `<div class="coin_container"><ul>`;
@@ -174,11 +211,16 @@ function renderTable()
         out += `<li class="coin_item" name="${coin.code}"> <img src="./images/${coin.code}.png"></img></li>`     
     }
 
-    out += `</ul>`
-
-
+    out += `</ul>`;
 
     out += `</div>`;
+
+    const profile = states.profiles[states.activeProfile];
+
+    out += `<div id="active_coin"> 
+                <img src="./images/${profile.activeCoin}.png" >
+                <div>${profile.activeCoin}</div>
+            </div>`;
 
     return out;
         

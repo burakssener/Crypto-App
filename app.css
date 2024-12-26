@@ -17,9 +17,18 @@
     list-style: none;
 }
 
-.coin_container> ul > li > img
+.coin_container> ul > li > img, #active_coin > img
 {
     width: 30px;
+}
+
+#active_coin
+{
+    display: flex;
+    margin-left: 30px;
+    margin-bottom: 10px;
+    align-items: center;
+    gap: 10px;
 }
 /* Layout and Container Styles */
 #root {
@@ -237,4 +246,43 @@ main > #inputs > .hidden {
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
+}
+
+.market {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    
+    border: 1px solid #000000;
+}
+
+
+.chart-container {
+    
+    position: relative;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    width: 800px;
+    height: 300px;
+    overflow: hidden;
+    margin: auto;
+}
+.candlestick-container {
+    
+    position: absolute;
+    bottom: 0;
+    width: 6px;
+    transition: left 0.5s ease-in-out;
+}
+
+.stick {
+    background-color: black;
+    position: absolute;
+    width: 2px;
+}
+
+.bar {
+    position: absolute;
+    width: 6px;
+    border-radius: 2px;
 }
