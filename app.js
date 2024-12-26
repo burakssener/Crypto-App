@@ -102,9 +102,14 @@ function renderPage() {
                         <div class="market">
                             ${renderMarket()} 
                         </div>
-                        ${renderLogin(profile1)}
                     </div>
                 </section>
+                <footer>
+                    <div id = "trading-container"></div>
+                    <div id = "wallet-container">  
+                        ${renderWallet(profile1)}
+                    </div>
+                </footer>
             
                 
               
@@ -275,17 +280,56 @@ function renderProfiles() {
 
 
 
-function renderLogin(profile) {
-    let out = "";
+function renderWallet(profile) {
+    let out = `
+        <table class="wallet-table">
+            <thead>
+                <tr>
+                    <th>Coin</th>
+                    <th>Amount</th>
+                    <th>Subtotal</th>
+                    <th>Last Close</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
 
-    if (profile.wallet.length > 0) {
-        profile.wallet.forEach((item) => {
-            const [key, value] = Object.entries(item)[0];
-            out += `<p><strong>${key.toUpperCase()}:</strong> ${value}</p>`;
-        });
-    } else {
-        out = "<p>No wallet information available.</p>";
+    // First row for dollar balance (highlighted row)
+    const dollarBalance = profile.wallet.find(item => item.dollar);
+    if (dollarBalance) {
+        out += `
+            <tr class="highlight-row">
+                <td>Dolar</td>
+                <td>$${parseFloat(dollarBalance.dollar).toFixed(4)}</td>
+                <td></td>
+                <td></td>
+            </tr>
+        `;
     }
+
+    // Other coins
+    profile.wallet.forEach((item) => {
+        const [coin, amount] = Object.entries(item)[0];
+        if (coin !== 'dollar') {
+            const marketData = states.market_todate.find((m) => m.code === coin);
+            const lastClose = marketData ? marketData.close : "N/A";
+            const subtotal = marketData ? (amount * lastClose).toFixed(2) : "N/A";
+
+            out += `
+                <tr>
+                    <td>${coin.charAt(0).toUpperCase() + coin.slice(1)}</td>
+                    <td>${amount.toFixed(6)}</td>
+                    <td>${subtotal}</td>
+                    <td>${lastClose}</td>
+                </tr>
+            `;
+        }
+    });
+
+    out += `
+            </tbody>
+        </table>
+    `;
 
     return out;
 }
