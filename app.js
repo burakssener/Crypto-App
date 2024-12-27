@@ -136,8 +136,7 @@ function renderPage() {
         $("#amountInput").on("input", function () {
             const amount = parseFloat($(this).val()) || 0;
             const activeCoin = states.profiles[states.activeProfile].activeCoin;
-            const marketData = states.market_todate.find((m) => m.code === activeCoin);
-            const price = marketData ? marketData.close : 0; // Use the latest close price
+            price = coins[profile.date].find((coin) => coin.code === activeCoin).close;
             const totalValue = (amount * price).toFixed(2);
         
             $("#dollarValue").text(`= $${totalValue}`);
@@ -149,7 +148,7 @@ function renderPage() {
         $('.candlestick-container').on('mouseenter', function() {
 
             const index = $(this).data("index");
-            const marketData = states.market_todate[index];
+            const marketData = market.find((entry) => entry.date === states.profiles[states.activeProfile].date);
             $("#active_coin_data").css("visibility", "visible");
     
             if (marketData) {
@@ -190,8 +189,58 @@ function renderPage() {
         
             update(); // Re-render the page with updated state
         });
+
+        $(document).on("click", "#tradeButton", function () {
+            const profile = states.profiles[states.activeProfile];
+            const activeCoin = profile.activeCoin;
+            const amount = parseFloat($("#amountInput").val());
+            price = market.find((entry) => entry.date === profile.date).coins.find((coin) => coin.code === activeCoin).close;
+
+            
+        
+            if (!amount || amount <= 0 || !price) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+        
+            const isBuying = $("#buyButton").hasClass("active");
+            const dollarBalance = profile.wallet.find(item => item.dollar);
+            const coinBalance = profile.wallet.find(item => item[activeCoin]) || { [activeCoin]: 0 };
+        
+            if (isBuying) {
+                // BUY Logic
+                const totalCost = amount * price;
+        
+                if (dollarBalance && dollarBalance.dollar >= totalCost) {
+                    dollarBalance.dollar -= totalCost;
+                    coinBalance[activeCoin] = (coinBalance[activeCoin] || 0) + amount;
+        
+                    if (!profile.wallet.includes(coinBalance)) profile.wallet.push(coinBalance);
+        
+                    alert(`Bought ${amount} ${activeCoin} for $${totalCost.toFixed(2)}`);
+                } else {
+                    alert("Insufficient funds.");
+                }
+            } else {
+                // SELL Logic
+                if (coinBalance && coinBalance[activeCoin] >= amount) {
+                    coinBalance[activeCoin] -= amount;
+                    dollarBalance.dollar += amount * price;
+        
+                    alert(`Sold ${amount} ${activeCoin} for $${(amount * price).toFixed(2)}`);
+                } else {
+                    alert("Insufficient coins.");
+                }
+            }
+        
+            update(); // Update UI and wallet
+        });
+        
+        
     }
 }
+
+
 
 function renderTrading() {
     const profile = states.profiles[states.activeProfile];
@@ -201,45 +250,45 @@ function renderTrading() {
     const $container = $("<div>").addClass("trading-container");
 
     // Add title
-    const $title = $("<h2>").text("Trading");
-    $container.append($title);
+    $container.append($("<h2>").text("Trading"));
 
-    // Create Buy/Sell buttons
-    const $buttonGroup = $("<div>").addClass("trading-buttons");
-    const $buyButton = $("<button>")
-        .attr("id", "buyButton")
-        .addClass("buy-button active") // Default is Buy active
-        .text("Buy");
-    const $sellButton = $("<button>")
-        .attr("id", "sellButton")
-        .addClass("sell-button")
-        .text("Sell");
-    $buttonGroup.append($buyButton, $sellButton);
-    $container.append($buttonGroup);
+    // Buy/Sell toggle buttons
+    $container.append(
+        $("<div>")
+            .addClass("trading-buttons")
+            .append(
+                $("<button>").attr("id", "buyButton").addClass("buy-button active").text("Buy"),
+                $("<button>").attr("id", "sellButton").addClass("sell-button").text("Sell")
+            )
+    );
 
-    // Add inputs for amount
-    const $inputs = $("<div>").addClass("trading-inputs");
-    const $amountInput = $("<input>")
-        .attr({
-            type: "number",
-            id: "amountInput",
-            placeholder: "Amount"
-        })
-        .addClass("amount-input");
-    const $dollarSign = $("<span>").attr("id", "dollarValue").text("= $0");
-    $inputs.append($amountInput, $dollarSign);
-    $container.append($inputs);
+    // Input for amount and dynamic price
+    $container.append(
+        $("<div>")
+            .addClass("trading-inputs")
+            .append(
+                $("<input>")
+                    .attr({ type: "number", id: "amountInput", placeholder: "Amount" })
+                    .addClass("amount-input"),
+                $("<span>").attr("id", "dollarValue").text("= $0")
+            )
+    );
 
-    // Add action button
-    const $actionButton = $("<button>")
-        .attr("id", "tradeButton")
-        .addClass("trade-button buy") // Default is Buy style
-        .text(`Buy ${activeCoin}`);
-    const $actionContainer = $("<div>").addClass("trading-action").append($actionButton);
-    $container.append($actionContainer);
+    // Action button
+    $container.append(
+        $("<div>")
+            .addClass("trading-action")
+            .append(
+                $("<button>")
+                    .attr("id", "tradeButton")
+                    .addClass("trade-button buy")
+                    .text(`Buy ${activeCoin}`)
+            )
+    );
 
     return $container.prop("outerHTML");
 }
+
 
 
 
@@ -263,8 +312,6 @@ function renderMarket() {
         }
     }
 
-    // Store in global state
-    states.market_todate = market_todate;
 
     if (market_todate.length === 0) {
         return "<p>No market data available for the selected coin.</p>";
@@ -386,70 +433,35 @@ function renderWallet(profile) {
         `;
     }
 
-    // Other coins
-    profile.wallet.forEach((item) => {
-        const [coin, amount] = Object.entries(item)[0];
-        if (coin !== 'dollar') {
-            const marketData = states.market_todate.find((m) => m.code === coin);
-            const lastClose = marketData ? marketData.close : "N/A";
-            const subtotal = marketData ? (amount * lastClose).toFixed(2) : "N/A";
+    // Find the market data for the profile's date
+    const marketData = market.find((entry) => entry.date === profile.date);
 
-            out += `
-                <tr>
-                    <td>${coin.charAt(0).toUpperCase() + coin.slice(1)}</td>
-                    <td>${amount.toFixed(6)}</td>
-                    <td>${subtotal}</td>
-                    <td>${lastClose}</td>
-                </tr>
-            `;
-        }
-    });
-
-    out += `
-            </tbody>
-        </table>
-    `;
-
-    return out;
-}
-
-
-
-
-function renderWallet(profile) {
-    let out = `
-        <table class="wallet-table">
-            <thead>
-                <tr>
-                    <th>Coin</th>
-                    <th>Amount</th>
-                    <th>Subtotal</th>
-                    <th>Last Close</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    // First row for dollar balance (highlighted row)
-    const dollarBalance = profile.wallet.find(item => item.dollar);
-    if (dollarBalance) {
+    // If no market data is found, log the issue and return the wallet with only dollar balance
+    if (!marketData) {
+        console.error("No market data found for date:", profile.date);
         out += `
-            <tr class="highlight-row">
-                <td>Dolar</td>
-                <td>$${parseFloat(dollarBalance.dollar).toFixed(4)}</td>
-                <td></td>
-                <td></td>
+            <tr>
+                <td colspan="4">No market data available for ${profile.date}</td>
             </tr>
         `;
+        out += `</tbody></table>`;
+        return out;
     }
 
-    // Other coins
+    // Process coins in the profile's wallet
     profile.wallet.forEach((item) => {
         const [coin, amount] = Object.entries(item)[0];
         if (coin !== 'dollar') {
-            const marketData = states.market_todate.find((m) => m.code === coin);
-            const lastClose = marketData ? marketData.close : "N/A";
-            const subtotal = marketData ? (amount * lastClose).toFixed(2) : "N/A";
+            const coinMarketData = marketData.coins.find((m) => m.code === coin);
+
+            // If no market data is found for the coin, skip it
+            if (!coinMarketData) {
+                console.error("No market data found for coin:", coin);
+                return;
+            }
+
+            const lastClose = coinMarketData.close;
+            const subtotal = (amount * lastClose).toFixed(2);
 
             out += `
                 <tr>

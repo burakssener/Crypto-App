@@ -59,7 +59,6 @@ main > nav
 
 main > section
 {
-    border: 1px solid black;
     height: 95%;
     text-align: center;
    
@@ -309,7 +308,6 @@ footer {
     justify-content: center;
     align-items: center;
     height: 400px;
-    border: 1px solid black;
 
 }
 #trading-container
@@ -318,7 +316,6 @@ footer {
     flex-direction: column;
     gap: 10px;
     height: 100%;
-    border: 1px solid black;
     flex: 5;
 }
 
@@ -328,7 +325,6 @@ footer {
     flex-direction: column;
     gap: 10px;
     height: 100%;
-    border: 1px solid black;
     flex: 7;
 }
 
@@ -369,7 +365,6 @@ footer {
     display: flex;
     justify-content: center;
     margin: 10px 0;
-    border: 
     
 }
 
