@@ -256,6 +256,29 @@ main > #inputs > .hidden {
     text-align: center;
     font-size: 55px;
 }
+#play
+{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#play > img
+{
+    width: 10px;
+}
+
+#user_info
+{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#user_info > img
+{
+    width: 25px;
+}
 
 .market-container {
     position: relative;
@@ -393,8 +416,8 @@ footer {
 }
 
 .trading-buttons button {
-    width: 100px;
-    padding: 10px;
+    width: 125px;
+    padding: 5px;
     border: 2px solid #4caf50;
     border-radius: 5px;
     background-color: white;
@@ -421,12 +444,12 @@ footer {
     justify-content: center;
     align-items: center;
     gap: 10px;
-    margin: 20px 0;
+    margin: 10px 0;
 }
 
 .trading-inputs input {
     padding: 10px;
-    width: 150px;
+    width: 250;
     border: 2px solid #ddd;
     border-radius: 5px;
 }
@@ -440,7 +463,7 @@ footer {
 
 .trading-action .trade-button {
     width: 200px;
-    padding: 10px;
+    padding: 5px;
     background-color: #4caf50;
     color: white;
     font-weight: bold;

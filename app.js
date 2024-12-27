@@ -84,10 +84,10 @@ function renderPage() {
             <main>
                 <nav>
                     <p><strong>CTIS</strong> Crypto Trading Information System</p>
-                    <div>
+                    <div id="user_info">
+                        <img src="./images/user.png">
                         <strong>${profile1.name}</strong>
                         <button id="backButton">Log Out</button>
-                    </div>
                 </nav>
                 <section>
                     <div class="date">
@@ -96,7 +96,10 @@ function renderPage() {
 
                     <div class="date_buttons">
                         <button id="nextDay">Next Day</button>
-                        <button id="play">Play</button>
+                        <button id="play">
+                        <img src = "./images/${timer == null ? "play" : "pause"}.png">
+                        <span>${timer == null ? "Play" : "Stop"}</span>
+                        </button>
                     </div>
                     <div id="wallet">
                         <div class="market-container">
@@ -210,7 +213,7 @@ function renderPage() {
         
             // Update the profile date in states
             states.profiles[states.activeProfile].date = incrementedDate;
-        
+    
             update();
           }
 
@@ -219,15 +222,13 @@ function renderPage() {
          
           $("#play").on("click", function(){
              if ( timer === null) {
-                timer = setInterval(incCounter, 1000) ;
-                update ();
-                $("#play").text("stop");
-                //$(this).attr("src", "./img/pause.png")
+                timer = setInterval(incCounter, 500);
+                
              } else {
                 clearInterval(timer)
-                //$(this).attr("src", "./img/play.png")
                 timer = null ; 
                 update();
+                
              }
           })
 
@@ -262,6 +263,10 @@ function renderPage() {
         
                     alert(`Bought ${amount} ${activeCoin} for $${totalCost.toFixed(2)}`);
                 } 
+                else
+                {
+                    alert(`Your balance is not enough!!`);
+                }
             } else {
                 // SELL Logic
                 if (coinBalance && coinBalance[activeCoin] >= amount) {
@@ -270,6 +275,10 @@ function renderPage() {
         
                     alert(`Sold ${amount} ${activeCoin} for $${(amount * price).toFixed(2)}`);
                 } 
+                else
+                {
+                    alert(`You don't have specified amoun of coin!!`);
+                }
             }
         
             update(); // Update UI and wallet
@@ -289,7 +298,7 @@ function renderTrading() {
     const $container = $("<div>").addClass("trading-container");
 
     // Add title
-    $container.append($("<h3>").text("Trading"));
+    $container.append($("<h3>").text("Trading").css("text-align", "center"));
 
     // Buy/Sell toggle buttons
     $container.append(
@@ -525,7 +534,7 @@ function renderWallet(profile) {
             const coinMarketData = marketData.coins.find((m) => m.code === coin);
 
             // If no market data is found for the coin, skip it
-            if (!coinMarketData) {
+            if (!coinMarketData ) {
                 console.error("No market data found for coin:", coin);
                 return;
             }
@@ -534,7 +543,9 @@ function renderWallet(profile) {
             const subtotal = amount * lastClose; // Calculate subtotal in dollars
             totalWalletValue += subtotal; // Add to total wallet value
 
-            out += `
+            if(amount != 0.0)
+            {
+                out += `
                 <tr>
                     <td>${coin.charAt(0).toUpperCase() + coin.slice(1)}</td>
                     <td>${amount.toFixed(2)}</td>
@@ -542,6 +553,8 @@ function renderWallet(profile) {
                     <td>${lastClose}</td>
                 </tr>
             `;
+            }
+            
         }
     });
 
