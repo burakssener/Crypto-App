@@ -15,6 +15,7 @@
 .coin_container> ul > li
 {
     list-style: none;
+    padding: 5px;
 }
 
 .coin_container> ul > li > img, #active_coin > img
@@ -25,10 +26,12 @@
 #active_coin
 {
     display: flex;
-    margin-left: 30px;
-    margin-bottom: 5px;
+    padding: 5px 0;
     align-items: center;
     gap: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    border-collapse: separate;
 }
 /* Layout and Container Styles */
 #root {
@@ -227,7 +230,7 @@ main > #inputs > .hidden {
 .modal-content input[type="text"] {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 16px;
     margin-bottom: 15px;
@@ -247,11 +250,24 @@ main > #inputs > .hidden {
     margin-bottom: 20px;
 }
 
+#wallet-header 
+{
+    text-align: center;
+    font-size: 55px;
+}
+
+.market-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
 .market {
     position: relative;
     height: 200px;
     width: 100%;
-    border: 1px solid #000000;
+    margin: 25px 0;
 }
 
 .latest-price-line {
@@ -331,8 +347,10 @@ footer {
 /* Wallet Table Styles */
 .wallet-table {
     width: 100%;
-    border-collapse: collapse;
+    border-spacing: 1px; /* Space between borders */
+    border-collapse: separate; /* Prevent borders from collapsing */
     text-align: center;
+    border: 1px solid #ddd; /* Ensure outer border color is consistent */
 }
 
 .wallet-table th {
@@ -403,7 +421,7 @@ footer {
 .trading-inputs input {
     padding: 10px;
     width: 150px;
-    border: 2px solid #ccc;
+    border: 2px solid #ddd;
     border-radius: 5px;
 }
 
@@ -455,3 +473,39 @@ footer {
         transform: scale(1);
     }
 }
+
+
+.dotted-line {
+    position: absolute;
+    width: 100%; /* Full width of the chart */
+    border-top: 1px solid #ddd; /* Dotted line */
+    text-align: right;
+    font-size: 12px;
+    color: black;
+    pointer-events: none; /* Prevent interaction */
+}
+
+.chart-high-line .line-label {
+    color: black;
+    position: absolute;
+    top: -15px; /* Adjust label position */
+    right: 0;
+}
+
+.chart-low-line .line-label {
+    color: black;
+    position: absolute;
+    bottom: -15px; /* Adjust label position */
+    right: 0;
+}
+
+.latest-price-line .latest-price-label {
+    color: black;
+    background: white;
+    padding: 2px 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    position: absolute;
+    transform: translateY(-50%);
+}
+

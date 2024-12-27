@@ -99,18 +99,21 @@ function renderPage() {
                         <button id="play">Play</button>
                     </div>
                     <div id="wallet">
-                        ${renderTable()}
-                        <div class="market">
-                            ${renderMarket()} 
+                        <div class="market-container">
+                                ${renderTable()}
+                            <div class="market">
+                                ${renderMarket()} 
+                            </div>
                         </div>
                     </div>
                 </section>
+                <h1 id="wallet-header">$${renderWallet(profile1).totalWalletValue.toFixed(2)}</h1>
                 <footer>
                     <div id = "trading-container">
                         ${renderTrading()}
                     </div>
                     <div id = "wallet-container">  
-                        ${renderWallet(profile1)}
+                        ${renderWallet(profile1).html}
                     </div>
                 </footer>
             
@@ -327,7 +330,6 @@ function renderTrading() {
 
 
 
-
 function renderMarket() {
     const market_todate = [];
     const profile = states.profiles[states.activeProfile];
@@ -348,19 +350,23 @@ function renderMarket() {
         }
     }
 
-
     if (market_todate.length === 0) {
         return "<p>No market data available for the selected coin.</p>";
     }
 
-    const marketMinLow = Math.min(...market_todate.map((m) => m.low));
-    const maxRange = Math.max(...market_todate.map((m) => m.high - m.low));
+    // Calculate the highest and lowest points on the chart
+    const chartHighestValue = (Math.max(...market_todate.map((m) => m.high) ) * 1.3).toFixed(2); // Highest high
+    const chartLowestValue = (Math.min(...market_todate.map((m) => m.low) ) * 0.7).toFixed(2); // Lowest low
+
+    const marketMinLow = chartLowestValue;
+    const maxRange = chartHighestValue - chartLowestValue;
     const chartHeight = $(".market").height();
-    const scaleFactor = (chartHeight / maxRange) * 0.2;
+    const scaleFactor = chartHeight / maxRange;
 
     let x = 0;
     let out = "";
 
+    // Generate candlesticks
     market_todate.forEach((data, i) => {
         let stickHeight = (data.high - data.low) * scaleFactor;
         let barHeight = Math.abs(data.open - data.close) * scaleFactor;
@@ -378,19 +384,34 @@ function renderMarket() {
         x += 10;
     });
 
-    // Add the dotted line for the latest (most recent) close price
+    // Add the current value line (latest close price)
     const latestData = market_todate[market_todate.length - 1];
     if (latestData) {
         const latestClosePos = (latestData.close - marketMinLow) * scaleFactor;
         out += `
-            <div class="latest-price-line" style=" bottom: ${latestClosePos}px;">
+            <div class="latest-price-line" style="bottom: ${latestClosePos}px;">
                 <span class="latest-price-label">${latestData.close}</span>
             </div>
         `;
     }
 
+    // Add the top of chart (highest value)
+    out += `
+        <div class="dotted-line chart-high-line" style="bottom: ${chartHeight}px;">
+            <span class="line-label">$${chartHighestValue}</span>
+        </div>
+    `;
+
+    // Add the bottom of chart (lowest value)
+    out += `
+        <div class="dotted-line chart-low-line" style="bottom: 0px;">
+            <span class="line-label">$${chartLowestValue}</span>
+        </div>
+    `;
+
     return out;
 }
+
 
 
   
@@ -419,6 +440,7 @@ function renderTable()
     const profile = states.profiles[states.activeProfile];
 
     out += `<div id="active_coin"> 
+                <br>
                 <img src="./images/${profile.activeCoin}.png" >
                 <div>${profile.activeCoin}</div>
                 <div id="active_coin_data"></div>
@@ -451,6 +473,7 @@ function renderProfiles() {
 
 
 function renderWallet(profile) {
+    let totalWalletValue = 0; // Initialize total wallet value
     let out = `
         <table class="wallet-table">
             <thead>
@@ -467,10 +490,13 @@ function renderWallet(profile) {
     // First row for dollar balance (highlighted row)
     const dollarBalance = profile.wallet.find(item => item.dollar);
     if (dollarBalance) {
+        const dollarAmount = parseFloat(dollarBalance.dollar);
+        totalWalletValue += dollarAmount;
+
         out += `
             <tr class="highlight-row">
-                <td>Dolar</td>
-                <td>$${parseFloat(dollarBalance.dollar).toFixed(4)}</td>
+                <td>Dollar</td>
+                <td>$${dollarAmount.toFixed(2)}</td>
                 <td></td>
                 <td></td>
             </tr>
@@ -489,7 +515,7 @@ function renderWallet(profile) {
             </tr>
         `;
         out += `</tbody></table>`;
-        return out;
+        return { totalWalletValue, html: out };
     }
 
     // Process coins in the profile's wallet
@@ -505,13 +531,14 @@ function renderWallet(profile) {
             }
 
             const lastClose = coinMarketData.close;
-            const subtotal = (amount * lastClose).toFixed(2);
+            const subtotal = amount * lastClose; // Calculate subtotal in dollars
+            totalWalletValue += subtotal; // Add to total wallet value
 
             out += `
                 <tr>
                     <td>${coin.charAt(0).toUpperCase() + coin.slice(1)}</td>
-                    <td>${amount.toFixed(6)}</td>
-                    <td>${subtotal}</td>
+                    <td>${amount.toFixed(2)}</td>
+                    <td>${subtotal.toFixed(2)}</td>
                     <td>${lastClose}</td>
                 </tr>
             `;
@@ -523,5 +550,5 @@ function renderWallet(profile) {
         </table>
     `;
 
-    return out;
+    return { totalWalletValue, html: out };
 }
