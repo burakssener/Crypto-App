@@ -14,6 +14,7 @@
 
 // 
 let states = {}
+var timer = null ;
 
 // Initialize states from the storage
 let storedData = localStorage.getItem("states") 
@@ -136,7 +137,8 @@ function renderPage() {
         $("#amountInput").on("input", function () {
             const amount = parseFloat($(this).val()) || 0;
             const activeCoin = states.profiles[states.activeProfile].activeCoin;
-            price = coins[profile.date].find((coin) => coin.code === activeCoin).close;
+            const MarketData = market.find((entry) => entry.date === states.profiles[states.activeProfile].date);
+            price = MarketData.coins.find((coin) => coin.code === activeCoin).close;
             const totalValue = (amount * price).toFixed(2);
         
             $("#dollarValue").text(`= $${totalValue}`);
@@ -189,7 +191,12 @@ function renderPage() {
         });
 
         $("#nextDay").on("click", function () {
-            // Parse the current date string into a Date object
+            
+            incCounter();
+        });
+
+        
+        function incCounter() {
             let currentDate = new Date(states.profiles[states.activeProfile].date.split('-').reverse().join('-'));
         
             // Increment the date by one day
@@ -201,10 +208,32 @@ function renderPage() {
             // Update the profile date in states
             states.profiles[states.activeProfile].date = incrementedDate;
         
-            update(); // Re-render the page with updated state
-        });
+            update();
+          }
 
-        $(document).on("click", "#tradeButton", function () {
+
+
+         
+          $("#play").on("click", function(){
+             if ( timer === null) {
+                timer = setInterval(incCounter, 1000) ;
+                update ();
+                $("#play").text("stop");
+                //$(this).attr("src", "./img/pause.png")
+             } else {
+                clearInterval(timer)
+                //$(this).attr("src", "./img/play.png")
+                timer = null ; 
+                update();
+             }
+          })
+
+
+
+
+
+
+        $("#tradeButton").on("click", function () {
             const profile = states.profiles[states.activeProfile];
             const activeCoin = profile.activeCoin;
             const amount = parseFloat($("#amountInput").val());
@@ -372,7 +401,15 @@ function renderTable()
     let i = 0;
     for(let coin of coins)
     {
-        out += `<li class="coin_item" name="${coin.code}"> <img src="./images/${coin.code}.png"></img></li>`     
+        if(coin.code == states.profiles[states.activeProfile].activeCoin)
+        {
+            out += `<li class="coin_item" name="${coin.code}" id="animated_coin"> <img src="./images/${coin.code}.png"></img></li>`;
+        }
+        else
+        {
+            out += `<li class="coin_item" name="${coin.code}"> <img src="./images/${coin.code}.png"></img></li>`;
+        }
+       
     }
 
     out += `</ul>`;
