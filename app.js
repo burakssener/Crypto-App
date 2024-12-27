@@ -145,16 +145,30 @@ function renderPage() {
 
         $(".market").html(renderMarket());
 
-        $('.candlestick-container').on('mouseenter', function() {
-
-            const index = $(this).data("index");
-            const marketData = market.find((entry) => entry.date === states.profiles[states.activeProfile].date);
-            $("#active_coin_data").css("visibility", "visible");
-    
-            if (marketData) {
-                $("#active_coin_data").text(`Date: ${marketData.date} Open: ${marketData.open} Close: ${marketData.close} High: ${marketData.high} low: ${marketData.low} `);
+        $('.candlestick-container').on('mouseenter', function () {
+            const index = $(this).data("index"); // Get the index from the candlestick container
+            const marketData = market[index]; // Use the index to access the corresponding market data entry
+        
+            if (!marketData) {
+                console.error("No market data found for index:", index);
+                return;
             }
+        
+            // Find the specific coin data for the active coin
+            const profile = states.profiles[states.activeProfile];
+            const coinData = marketData.coins.find((coin) => coin.code === profile.activeCoin);
+        
+            if (!coinData) {
+                console.error("No coin data found for the active coin:", profile.activeCoin);
+                return;
+            }
+        
+            // Display the data in the active coin data element
+            $("#active_coin_data").css("visibility", "visible").text(
+                `Date: ${marketData.date} Open: ${coinData.open} Close: ${coinData.close} High: ${coinData.high} Low: ${coinData.low}`
+            );
         });
+        
 
         $('.candlestick-container').on('mouseleave', function() {
 
@@ -198,10 +212,7 @@ function renderPage() {
 
             
         
-            if (!amount || amount <= 0 || !price) {
-                alert("Please enter a valid amount.");
-                return;
-            }
+        
         
             const isBuying = $("#buyButton").hasClass("active");
             const dollarBalance = profile.wallet.find(item => item.dollar);
@@ -218,9 +229,7 @@ function renderPage() {
                     if (!profile.wallet.includes(coinBalance)) profile.wallet.push(coinBalance);
         
                     alert(`Bought ${amount} ${activeCoin} for $${totalCost.toFixed(2)}`);
-                } else {
-                    alert("Insufficient funds.");
-                }
+                } 
             } else {
                 // SELL Logic
                 if (coinBalance && coinBalance[activeCoin] >= amount) {
@@ -228,9 +237,7 @@ function renderPage() {
                     dollarBalance.dollar += amount * price;
         
                     alert(`Sold ${amount} ${activeCoin} for $${(amount * price).toFixed(2)}`);
-                } else {
-                    alert("Insufficient coins.");
-                }
+                } 
             }
         
             update(); // Update UI and wallet
