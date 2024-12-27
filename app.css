@@ -481,7 +481,7 @@ footer {
     background-color: red;
 }
 
-#animated_coin {
+#animated_coin , .wallet_heartbeat {
     animation: heartbeat 3s infinite; /* Apply heartbeat animation */
 }
 

@@ -14,7 +14,7 @@
 
 // 
 let states = {}
-var timer = null ;
+var timer = null;
 
 // Initialize states from the storage
 let storedData = localStorage.getItem("states") 
@@ -90,6 +90,9 @@ function renderPage() {
                         <button id="backButton">Log Out</button>
                 </nav>
                 <section>
+                    <div class="date">
+                        <h1> Day ${calculateDayDifference(states.profiles[states.activeProfile].date, '1-01-2021')} </h1>
+                    </div>
                     <div class="date">
                         <h1>${profile1.date} </h1>
                     </div>
@@ -201,20 +204,33 @@ function renderPage() {
             incCounter();
         });
 
+
         
         function incCounter() {
-            let currentDate = new Date(states.profiles[states.activeProfile].date.split('-').reverse().join('-'));
+
+            if(calculateDayDifference(states.profiles[states.activeProfile].date, '1-01-2021') < 365)
+            { // Increment the date by one day
+
+                let currentDate = new Date(states.profiles[states.activeProfile].date.split('-').reverse().join('-'));
         
-            // Increment the date by one day
-            currentDate.setDate(currentDate.getDate() + 1);
+                currentDate.setDate(currentDate.getDate() + 1);
+            
+                // Format it back to 'DD-MM-YYYY'
+                const incrementedDate = currentDate.toISOString().split('T')[0].split('-').reverse().join('-');
+            
+                // Update the profile date in states
+                states.profiles[states.activeProfile].date = incrementedDate;
         
-            // Format it back to 'DD-MM-YYYY'
-            const incrementedDate = currentDate.toISOString().split('T')[0].split('-').reverse().join('-');
+                
+                update();
+            }
+            else
+            {
+                $("#wallet-header").addClass("wallet_heartbeat");
+
+            }
         
-            // Update the profile date in states
-            states.profiles[states.activeProfile].date = incrementedDate;
-    
-            update();
+           
           }
 
 
@@ -222,7 +238,7 @@ function renderPage() {
          
           $("#play").on("click", function(){
              if ( timer === null) {
-                timer = setInterval(incCounter, 500);
+                timer = setInterval(incCounter, 200);
                 
              } else {
                 clearInterval(timer)
@@ -290,6 +306,13 @@ function renderPage() {
 
 
 
+function calculateDayDifference(currentDateStr, startDateStr) {
+    const currentDate = new Date(currentDateStr.split('-').reverse().join('-')); // Convert 'DD-MM-YYYY' to Date object
+    const startDate = new Date(startDateStr.split('-').reverse().join('-')); // Convert 'DD-MM-YYYY' to Date object
+    const differenceInTime = currentDate - startDate; // Difference in milliseconds
+    const differenceInDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24)); // Convert to days
+    return differenceInDays + 1; // Add 1 to make it inclusive of the start date
+}
 function renderTrading() {
     const profile = states.profiles[states.activeProfile];
     const activeCoin = profile.activeCoin.toUpperCase();
