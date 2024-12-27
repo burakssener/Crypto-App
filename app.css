@@ -3,6 +3,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Inter', Arial, sans-serif;
 }
 
 .coin_container > ul
@@ -26,7 +27,7 @@
 #active_coin
 {
     display: flex;
-    padding: 5px 0;
+    padding: 5px;
     align-items: center;
     gap: 10px;
     border: 1px solid #ddd;
@@ -262,6 +263,9 @@ main > #inputs > .hidden {
     width: 100%;
     border: 1px solid #ddd;
     border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 .market {
     position: relative;
@@ -333,6 +337,7 @@ footer {
     gap: 10px;
     height: 100%;
     flex: 5;
+    margin-top: -25px;
 }
 
 #wallet-container
@@ -342,6 +347,7 @@ footer {
     gap: 10px;
     height: 100%;
     flex: 7;
+    margin-top: 5px;
 }
 
 /* Wallet Table Styles */
@@ -474,6 +480,33 @@ footer {
     }
 }
 
+#nextDay, #play, #backButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 20px;
+    background-color: white;
+    color: black;
+    border: 1px solid #ccc; /* Add border for better visibility */
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    text-align: center;
+}
+
+#nextDay:hover, #play:hover, #backButton:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+#nextDay:active, #play:active, #backButton:active {
+    background-color: #e0e0e0;
+    box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2);
+    transform: scale(0.98); /* Slight shrink on click */
+}
 
 .dotted-line {
     position: absolute;

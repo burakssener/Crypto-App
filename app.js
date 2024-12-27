@@ -289,7 +289,7 @@ function renderTrading() {
     const $container = $("<div>").addClass("trading-container");
 
     // Add title
-    $container.append($("<h2>").text("Trading"));
+    $container.append($("<h3>").text("Trading"));
 
     // Buy/Sell toggle buttons
     $container.append(
