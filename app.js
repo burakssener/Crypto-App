@@ -1,4 +1,4 @@
-// How we structured our states:
+// Structure of states:
 // active = 0 means the page that we choose profiles.
 // active = 1 means that individuals account
 // there will be users: [] that will store user objects.
@@ -32,7 +32,8 @@ function renderPage() {
     if (states.active == 0) {
         $("#root").html(`
             <main>
-              <p><strong>CTIS</strong> Crypto Trading Information System</p>
+              <p><strong>CTIS</strong> Crypto Trading Information System
+              
               <div id="profiles"> 
                 ${renderProfiles()} 
               </div>
@@ -47,6 +48,7 @@ function renderPage() {
                         <button type="button" id="addProfileButton">Add</button>
                     </div>
                 </div>
+                
               </div>
             </main>
         `);
@@ -165,7 +167,7 @@ function renderPage() {
                 return;
             }
         
-            // Find the specific coin data for the active coin
+            // Find the active coin data
             const profile = states.profiles[states.activeProfile];
             const coinData = marketData.coins.find((coin) => coin.code === profile.activeCoin);
         
@@ -174,7 +176,7 @@ function renderPage() {
                 return;
             }
         
-            // Display the data in the active coin data element
+            // Display the data 
             $("#active_coin_data").css("visibility", "visible").text(
                 `Date: ${marketData.date} Open: ${coinData.open} Close: ${coinData.close} High: ${coinData.high} Low: ${coinData.low}`
             );
@@ -209,7 +211,7 @@ function renderPage() {
         function incCounter() {
 
             if(calculateDayDifference(states.profiles[states.activeProfile].date, '1-01-2021') < 365)
-            { // Increment the date by one day
+            { 
 
                 let currentDate = new Date(states.profiles[states.activeProfile].date.split('-').reverse().join('-'));
         
@@ -227,7 +229,8 @@ function renderPage() {
             else
             {
                 $("#wallet-header").addClass("wallet_heartbeat");
-
+                $("#trading-container").remove();
+                
             }
         
            
@@ -238,7 +241,7 @@ function renderPage() {
          
           $("#play").on("click", function(){
              if ( timer === null) {
-                timer = setInterval(incCounter, 200);
+                timer = setInterval(incCounter, 50);
                 
              } else {
                 clearInterval(timer)
@@ -268,7 +271,7 @@ function renderPage() {
             const coinBalance = profile.wallet.find(item => item[activeCoin]) || { [activeCoin]: 0 };
         
             if (isBuying) {
-                // BUY Logic
+                // BUY
                 const totalCost = amount * price;
         
                 if (dollarBalance && dollarBalance.dollar >= totalCost) {
@@ -284,7 +287,7 @@ function renderPage() {
                     alert(`Your balance is not enough!!`);
                 }
             } else {
-                // SELL Logic
+                // SELL
                 if (coinBalance && coinBalance[activeCoin] >= amount) {
                     coinBalance[activeCoin] -= amount;
                     dollarBalance.dollar += amount * price;
@@ -307,20 +310,20 @@ function renderPage() {
 
 
 function calculateDayDifference(currentDateStr, startDateStr) {
-    const currentDate = new Date(currentDateStr.split('-').reverse().join('-')); // Convert 'DD-MM-YYYY' to Date object
-    const startDate = new Date(startDateStr.split('-').reverse().join('-')); // Convert 'DD-MM-YYYY' to Date object
-    const differenceInTime = currentDate - startDate; // Difference in milliseconds
-    const differenceInDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24)); // Convert to days
-    return differenceInDays + 1; // Add 1 to make it inclusive of the start date
+    const currentDate = new Date(currentDateStr.split('-').reverse().join('-')); // Convert 'DD-MM-YYYY' 
+    const startDate = new Date(startDateStr.split('-').reverse().join('-')); // Convert 'DD-MM-YYYY' 
+    const differenceInTime = currentDate - startDate; 
+    const differenceInDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24)); 
+    return differenceInDays + 1; 
 }
 function renderTrading() {
     const profile = states.profiles[states.activeProfile];
     const activeCoin = profile.activeCoin.toUpperCase();
 
-    // Create the trading container
+    
     const $container = $("<div>").addClass("trading-container");
 
-    // Add title
+   
     $container.append($("<h3>").text("Trading").css("text-align", "center"));
 
     // Buy/Sell toggle buttons
@@ -345,7 +348,6 @@ function renderTrading() {
             )
     );
 
-    // Action button
     $container.append(
         $("<div>")
             .addClass("trading-action")
@@ -386,7 +388,6 @@ function renderMarket() {
         return "<p>No market data available for the selected coin.</p>";
     }
 
-    // Calculate the highest and lowest points on the chart
     const chartHighestValue = (Math.max(...market_todate.map((m) => m.high) ) * 1.3).toFixed(2); // Highest high
     const chartLowestValue = (Math.min(...market_todate.map((m) => m.low) ) * 0.7).toFixed(2); // Lowest low
 
@@ -415,8 +416,6 @@ function renderMarket() {
 
         x += 10;
     });
-
-    // Add the current value line (latest close price)
     const latestData = market_todate[market_todate.length - 1];
     if (latestData) {
         const latestClosePos = (latestData.close - marketMinLow) * scaleFactor;
@@ -519,7 +518,6 @@ function renderWallet(profile) {
             <tbody>
     `;
 
-    // First row for dollar balance (highlighted row)
     const dollarBalance = profile.wallet.find(item => item.dollar);
     if (dollarBalance) {
         const dollarAmount = parseFloat(dollarBalance.dollar);
@@ -538,7 +536,7 @@ function renderWallet(profile) {
     // Find the market data for the profile's date
     const marketData = market.find((entry) => entry.date === profile.date);
 
-    // If no market data is found, log the issue and return the wallet with only dollar balance
+    // If no market data is found, error
     if (!marketData) {
         console.error("No market data found for date:", profile.date);
         out += `

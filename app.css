@@ -78,6 +78,10 @@ main > #inputs > .hidden {
     display: none;
 }
 
+
+
+
+
 .coin_item{
     cursor:pointer;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -302,7 +306,7 @@ main > #inputs > .hidden {
     width: 100%;
     border-top: 1px dashed gray;
     z-index: 1;
-    pointer-events: none; /* Prevent interaction */
+    pointer-events: none; 
 }
 
 .latest-price-label {
@@ -376,10 +380,10 @@ footer {
 /* Wallet Table Styles */
 .wallet-table {
     width: 100%;
-    border-spacing: 1px; /* Space between borders */
-    border-collapse: separate; /* Prevent borders from collapsing */
+    border-spacing: 1px; 
+    border-collapse: separate; 
     text-align: center;
-    border: 1px solid #ddd; /* Ensure outer border color is consistent */
+    border: 1px solid #ddd; 
 }
 
 .wallet-table th {
@@ -482,7 +486,7 @@ footer {
 }
 
 #animated_coin , .wallet_heartbeat {
-    animation: heartbeat 3s infinite; /* Apply heartbeat animation */
+    animation: heartbeat 3s infinite; 
 }
 
 @keyframes heartbeat {
@@ -503,6 +507,11 @@ footer {
     }
 }
 
+
+.unvisible{
+    visibility:hidden;
+}
+
 #nextDay, #play, #backButton {
     display: inline-flex;
     align-items: center;
@@ -510,7 +519,7 @@ footer {
     padding: 7px 20px;
     background-color: white;
     color: black;
-    border: 1px solid #ccc; /* Add border for better visibility */
+    border: 1px solid #ccc; 
     border-radius: 8px;
     font-size: 15px;
     font-weight: bold;
@@ -528,30 +537,30 @@ footer {
 #nextDay:active, #play:active, #backButton:active {
     background-color: #e0e0e0;
     box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2);
-    transform: scale(0.98); /* Slight shrink on click */
+    transform: scale(0.98); 
 }
 
 .dotted-line {
     position: absolute;
-    width: 100%; /* Full width of the chart */
-    border-top: 1px solid #ddd; /* Dotted line */
+    width: 100%; 
+    border-top: 1px solid #ddd; 
     text-align: right;
     font-size: 12px;
     color: black;
-    pointer-events: none; /* Prevent interaction */
+    pointer-events: none; 
 }
 
 .chart-high-line .line-label {
     color: black;
     position: absolute;
-    top: -15px; /* Adjust label position */
+    top: -15px; 
     right: 0;
 }
 
 .chart-low-line .line-label {
     color: black;
     position: absolute;
-    bottom: -15px; /* Adjust label position */
+    bottom: -15px; 
     right: 0;
 }
 
