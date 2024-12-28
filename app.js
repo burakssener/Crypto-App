@@ -33,7 +33,14 @@ function renderPage() {
         $("#root").html(`
             <main>
               <p><strong>CTIS</strong> Crypto Trading Information System
-              
+              <p id="group_names">
+                        <strong>Contributors:</strong>
+                        Burak Şener,
+                        Ahmet Can Polat,
+                        Berkay Doğan,
+                        Erdem Gözen,
+                        Ulaş Çete
+              </p>
               <div id="profiles"> 
                 ${renderProfiles()} 
               </div>
@@ -241,7 +248,7 @@ function renderPage() {
          
           $("#play").on("click", function(){
              if ( timer === null) {
-                timer = setInterval(incCounter, 50);
+                timer = setInterval(incCounter, 400);
                 
              } else {
                 clearInterval(timer)
