@@ -1,3 +1,10 @@
+/*
+Burak Şener,
+Ahmet Canpolat,
+Berkay Doğan,
+Erdem Gözen,
+Ulaş Çete
+*/
 // Structure of states:
 // active = 0 means the page that we choose profiles.
 // active = 1 means that individuals account
@@ -36,7 +43,7 @@ function renderPage() {
               <p id="group_names">
                         <strong>Contributors:</strong>
                         Burak Şener,
-                        Ahmet Can Polat,
+                        Ahmet Canpolat,
                         Berkay Doğan,
                         Erdem Gözen,
                         Ulaş Çete
@@ -213,8 +220,7 @@ function renderPage() {
             incCounter();
         });
 
-
-        
+    
         function incCounter() {
 
             if(calculateDayDifference(states.profiles[states.activeProfile].date, '1-01-2021') < 365)
@@ -235,8 +241,15 @@ function renderPage() {
             }
             else
             {
-                $("#wallet-header").addClass("wallet_heartbeat");
-                $("#trading-container").remove();
+                if( ! $("#wallet-header").hasClass("wallet_heartbeat"))
+                {
+                    $("#wallet-header").addClass("wallet_heartbeat");
+                    $("#trading-container").remove();
+                    $("#wallet-header").after(`<h3 style = "text-align:center;">Wallet</h3>`);
+
+                }
+
+                
                 
             }
         
@@ -248,7 +261,7 @@ function renderPage() {
          
           $("#play").on("click", function(){
              if ( timer === null) {
-                timer = setInterval(incCounter, 400);
+                timer = setInterval(incCounter, 699);
                 
              } else {
                 clearInterval(timer)
